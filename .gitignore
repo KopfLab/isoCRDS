@@ -1,1 +1,49 @@
 docs
+
+# GIT ignore commands for the entire project
+
+# exclude output files
+*.rda
+*.pdf
+*.html
+*.png
+*.jpeg
+*.jpg
+*.pptx
+*.docx
+
+# OS generated files
+.DS_Store
+.DS_Store?
+~$*
+.Spotlight*
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# exclude R & Rstudio temp files
+*.utf8.md
+*.knit.md
+.Rproj.user
+.Rhistory
+.Rapp.history
+.RData
+.Ruserdata
+.Rproj.user/
+.Rbuildignore
+packrat/lib*/
+packrat/src/
+
+# exclude Python and Jupyter temp files
+template_files/
+.ipynb_checkpoints
+*.pyc
+
+# exclude authentication tokens
+.httr-oauth
+
+# exclude output
+output/**/*
+
+# exclude plots
+plots/**/*
