@@ -4,9 +4,15 @@ A package for reading, mapping, and analyzing Cavity Ring Down Spectroscopy (CRD
 This data is packaged as .dat files which require the proprietary Picarro software to open and Visualize. This software is not amenable to high-throughput analyses or detailed computation.
 
 ## Installation
-...
+
+Install the package with
+
+```
+devtools::install_github(https://github.com/KopfLab/isoCRDS/)
+```
 
 ## Usage
+
 `iso_read_crds()`
 
 `iso_map_crds()`
