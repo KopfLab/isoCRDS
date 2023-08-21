@@ -3,23 +3,19 @@
 #' @param crds_data cavity ring-down spectroscopy with a datetime column. Ideally this has been read using 'iso_read_crds'
 #' @param sample_map a three-column tibble containing sample_id, datetime_start, and datetime_end, corresponding to sample intervals
 #' @returns a tibble of CRDS data with a sample_id column mapped to specific time intervals
-#' 
+#'
 
 require(dplyr)
 require(fuzzyjoin)
 
-
-inj <- read_rds(file = "cache/crds_injection.RDS")
-map <- readxl::read_excel("data/sample_map/sample_map.xlsx")
-
 iso_map_crds <- function(crds_data, sample_map) {
-  mapped_data <- crds_data |> 
+  mapped_data <- crds_data |>
     fuzzyjoin::fuzzy_left_join(
       map, # join the sample map
       by = c("datetime" = "datetime_start", "datetime" = "datetime_end"),
       # match function is datetime >= datetime_start *and* <= datetime_end
       match_fun = list(`>=`, `<=`)
-    ) |> 
+    ) |>
     # add the is_in_interval boolean for easy filtering
     mutate(
       is_in_interval = !is.na(sample_id)
