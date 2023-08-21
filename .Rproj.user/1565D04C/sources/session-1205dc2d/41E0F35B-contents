@@ -1,0 +1,11 @@
+Package: isoCRDS
+Type: Package
+Title: Read and Analyze Cavity Ring Down Spectroscopy (CRDS) Data
+Version: 0.1.0
+Author: Tristan Caro
+Maintainer: The package maintainer <tristan.caro@colorado.edu>
+Description: Reads cavity ring down spectroscopy data (CRDS) files output from Picarro
+    instruments. Allows users to map sample metadata onto Picarro flow CRDS data.
+License: MIT
+Encoding: UTF-8
+LazyData: true
