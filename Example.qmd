@@ -15,9 +15,11 @@ editor_options:
 
 library(tidyverse) # CRAN v2.0.0
 library(lubridate) # CRAN v1.9.2
-source("source/iso_map_crds.R")
-source("source/iso_plot_crds.R")
-source("source/iso_read_crds.R")
+source("R/iso_map_crds.R")
+source("R/iso_plot_crds.R")
+source("R/iso_read_crds.R")
+source("R/iso_read_many_crds.R")
+source("R/iso_crds_app.R")
 
 ```
 
@@ -61,6 +63,7 @@ iso_plot_crds(full_crds_data)
 If you are happy with the quality of your data, save the dataframe as a `.RDS` file. This is useful both as a cache (so you don't need to do the time-consuming step of `iso_read_many_crds()` again.)
 
 ```{r}
+#| eval: false
 saveRDS("cache/my_crds_data.RDS")
 ```
 
@@ -81,6 +84,7 @@ We include a function `iso_map_crds()` which takes two arguments:
 Once you have imported your CRDS data and your sample map into your R session, you can map your samples to specific datetime intervals.
 
 ```{r}
+#| eval: false
 # import our manually-notated sample map
 inj_map <- readxl::read_excel("data/sample_map/sample_map.xlsx")
 
@@ -92,21 +96,31 @@ injection_mapped <- iso_map_crds(
 
 ```
 
-### Step 3, Option 1: Interactive Mapping
+#### Step 3, Option 2: Interactive Mapping
 
-You may opt to use our interactive Shiny app for sample mapping. Run the Shiny app. You will be prompted to upload the `.RDS` file that you generated in step 2. Once you've uploaded the file, you can create an interactive plot.
+You may opt to use our interactive Shiny app for sample mapping. This shiny app can be launched with:
 
-1.  Select plot parameters that help you see where your samples are in the data.
+```{r}
+#| eval: false
+# launch the interactive CRDS data mapping tool:
+iso_crds_app()
+```
+
+You will be prompted to upload the `.RDS` file that you generated in step 2. Once you've uploaded the file, you can create an interactive plot.
+
+1.  Select appropriate plot axes.
 2.  Use the rectangular select tool to select your sample data.
-3.  Press the "Add Sample_ID" button. This marks that selected data as belonging to your sample.\
+3.  Press the **Add Sample_ID** button. This marks the data you selected as belonging to your sample.\
     For example, selecting the plateau a region of heightened $CO_2$ or $CH_4$ .
-4.  When you are done selecting data and inputting sample names, use the Save Mapped Data button to save an updated `.RDS` file that is mapped.
+4.  Input the sample name in the **Enter Sample Name** box.
+5.  When you are done selecting data and inputting sample names, use the Save Mapped Data button to save an updated `.RDS` file that is mapped.
 
 ### Step 4: Calculate Summary Statistics
 
 You can re-import this dataset back into your R session and pass it downstream to any analyses you like.
 
 ```{r}
+#| eval: false
 mapped_data <- readRDS("mapped_data.rds")
 
 crds_summarized <- mapped_data |> 
@@ -133,3 +147,4 @@ crds_summarized |>
   geom_point(size = 3, alpha = 0.5) +
   theme_bw()
 ```
+
