@@ -11,7 +11,7 @@ require(fuzzyjoin)
 iso_map_crds <- function(crds_data, sample_map) {
   mapped_data <- crds_data |>
     fuzzyjoin::fuzzy_left_join(
-      map, # join the sample map
+      sample_map, # join with the sample map
       by = c("datetime" = "datetime_start", "datetime" = "datetime_end"),
       # match function is datetime >= datetime_start *and* <= datetime_end
       match_fun = list(`>=`, `<=`)
@@ -22,7 +22,5 @@ iso_map_crds <- function(crds_data, sample_map) {
     )
   return(mapped_data)
 }
-
-iso_map_crds(crds_data = inj, sample_map = map) |> filter(is_in_interval)
 
 
