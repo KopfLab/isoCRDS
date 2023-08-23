@@ -15,7 +15,7 @@ devtools::install_github("https://github.com/KopfLab/isoCRDS/")
 ```
 
 # CRDS Workflow
-This is a copy of the example file that can be found as `Example.html` and `Example.qmd`.
+This is a copy of the example file that can be found as `Example.html` and `Example.qmd`. I highly recommend opening the `.html` file, which shows function output.
 
 This workflow assumes you have run your samples on the Picarro CRDS and collected a day's worth of `.dat` files in a single directory.
 
