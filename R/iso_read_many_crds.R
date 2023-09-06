@@ -1,7 +1,8 @@
 #' @title read multiple Picarro CRDS output .dat file
 #' @description reads all Picarro cavity ring down spectroscopy 'CRDS' .dat files from a single directory.
-#' @param directory
+#' @param directory a folder directory containing multiple .dat files
 #' @return a tibble of cleaned Picarro data
+#' @export
 #'
 
 

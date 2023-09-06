@@ -1,0 +1,192 @@
+---
+title: "CRDS Tools"
+format: html
+editor: visual
+editor_options: 
+  chunk_output_type: console
+---
+
+# CRDS Workflow
+
+```{r}
+library(tidyverse) # CRAN v2.0.0
+library(lubridate) # CRAN v1.9.2
+library(isoCRDS)
+library(ggstackplot)
+```
+
+This workflow assumes you have run your samples on the Picarro CRDS and collected a day's worth of `.dat` files in a single directory.
+
+### Step 1: Collect your data.
+
+Move your `.dat` files into your working directory. Each batch of files that correspond to a continuous stretch of time should share a directory. If you have multiple continuous stretches of data, use different folders for them and process them separately. (This will make the plotting and mapping much more straightforward.)
+
+### Step 2: Tidy your data.
+
+The `.dat` file is unwieldy, but at its core it is a delimited table data structure. This package has two functions for reading `.dat` files: `iso_read_crds()` and `iso_read_many_crds()`. The first function is for reading a single `.dat` file.
+
+On the other hand, `iso_read_many_crds()` takes a directory as its path argument and reads all the `.dat` files in it. It combines them all into a single dataframe.
+
+```{r}
+# reading many files into a single dataframe
+full_crds_data <- iso_read_many_crds("2023-08-04_Memory_Test/")
+# Let's look at what columns are present in the CRDS dataset
+glimpse(full_crds_data)
+
+# how many rows?
+count(full_crds_data)
+```
+
+`iso_read_crds()` takes in a single `.dat` file and returns a single dataframe. This function is useful if you only have a short interval of data.
+
+```{r}
+# Reading a single file
+single_crds_data <- iso_read_crds("2023-08-04_Memory_Test/CFIDS2308-20230804-001241Z-DataLog_User.dat")
+
+# how many rows?
+count(single_crds_data)
+```
+
+Once you have read in your data, you can inspect its quality using `ggplot` or derived packages. Here we use `ggstackplot`.
+
+```{r eval=FALSE}
+full_crds_data |>
+    ggstackplot::ggstackplot(
+      x = datetime,
+      y = c("X12CO2", "X13CO2", "Delta_Raw_iCO2", "HP_12CH4", "HR_13CH4", "Delta_iCH4_Raw"),
+      alternate_axes = FALSE,
+      color = c("#201e75", "#4c4ac2", "#2e4759", "#a83e00", "#911600", "#592e48"),
+      template =
+        ggplot() +
+        scale_x_datetime() +
+        geom_line() +
+        theme_stackplot(),
+      add = list(
+        `X12CO2` = scale_y_continuous("12CO2 (ppm)"),
+        `X13CO2` = scale_y_continuous("13CO2 (ppm)"),
+        `Delta_Raw_iCO2` = scale_y_continuous("d13C_CO2"),
+        `HP_12CH4` = scale_y_continuous("12CH4"),
+        `HR_13CH4` = scale_y_continuous("13CH4"),
+        `Delta_iCH4_Raw` = scale_y_continuous("d13C_CH4")
+        )
+    )
+```
+
+If you are happy with the quality of your data, save the dataframe as a `.RDS` file. This is useful both as a cache (so you don't need to do the time-consuming step of `iso_read_many_crds()` again), as well as for the interactive mapping we are about to do.
+
+```{r, eval=FALSE}
+# save the CRDS data as an RDS file.
+saveRDS(full_crds_data, "my_crds_data.RDS")
+```
+
+### Step 3: Map your data.
+
+"Map my data?" Yes! You likely have discrete samples represented in your CRDS data, and you probably want to delimit what data corresponds to what sample. There are two ways to do this:
+
+#### Step 3, Option 1: Manual Mapping
+
+We include a function `iso_map_crds()` which takes two arguments:
+
+1.  `crds_data` : a CRDS tibble, like the one we generated with `iso_read_many_crds()`.
+
+2.  `sample_map`: a tibble with three columns: `sample_id`, `datetime_start`, and `datetime_end`. You can create this sample map in excel or in R while you collect your data on Picarro.
+
+For example: you inject a sample onto the Picarro. Note the time at which it begins to show up and stabilize in the cavity. Note the time at which you want to stop measuring it. Notate these in datetime format: `yyy-mm-dd hh:mm:ss`.
+
+Once you have imported your CRDS data and your sample map into your R session, you can map your samples to specific datetime intervals.
+
+```{r, eval=FALSE}
+
+# import our manually-notated sample map
+inj_map <- readxl::read_excel("vignettes/sample_map/sample_map.xlsx")
+
+# map the data!
+injection_mapped <- iso_map_crds(
+  crds_data = full_crds_data, # our CRDS tibble
+  sample_map = inj_map # our injection map
+  )
+
+```
+
+#### Step 3, Option 2: Interactive Mapping
+
+You may opt to use our interactive Shiny app for sample mapping. This shiny app can be launched with:
+
+```{r, eval=FALSE}
+source("R/iso_crds_app.R")
+# launches the interactive CRDS data mapping tool:
+iso_crds_app()
+```
+
+You will be prompted to upload the `.RDS` file that you generated in step 2. Once you've uploaded the file, you can create an interactive plot.
+
+1.  Select appropriate plot axes.
+2.  Use the rectangular select tool to select your sample data.
+3.  Press the **Add Sample_ID** button. This marks the data you selected as belonging to your sample.\
+    For example, selecting the plateau a region of heightened $CO_2$ or $CH_4$ .
+4.  Input the sample name in the **Enter Sample Name** box.
+5.  When you are done selecting data and inputting sample names, use the Save Mapped Data button to save an updated `.RDS` file that is mapped.
+
+### Step 4: Calculate Summary Statistics
+
+You can re-import this dataset back into your R session and pass it downstream to any analyses you like.
+
+```{r, eval=FALSE}
+
+mapped_data <- readRDS("vignettes/mapped_data.rds")
+
+crds_summarized <- mapped_data |> 
+  group_by(sample_id) |> 
+  summarize(
+    mean_d13CH4 = mean(Delta_iCH4_Raw),
+    mean_d13CO2 = mean(Delta_Raw_iCO2),
+    median_d13CH4 = median(Delta_iCH4_Raw),
+    median_d13CO2 = median(Delta_Raw_iCO2),
+    std_d13CH4 = sd(Delta_iCH4_Raw),
+    std_d13CO2 = sd(Delta_Raw_iCO2)
+  )
+
+crds_summarized
+
+crds_summarized |> 
+  filter(!is.na(sample_id)) |> 
+  pivot_longer(c(median_d13CH4, median_d13CO2),
+               names_to = "gas",
+               values_to = "d13C_VPDB") |> 
+  ggplot(
+    aes(
+      x = sample_id,
+      y = d13C_VPDB,
+      color = gas,
+      fill = gas,
+      label = round(d13C_VPDB, 1)
+    )
+  ) +
+  geom_hline(yintercept = 1) +
+  ggrepel::geom_label_repel(
+    color = "black", 
+    fill = "white", 
+    size = 2,
+    nudge_y = 1000,
+    nudge_x = 0.75,
+    segment.color = "#e0e0e0"
+    ) +
+  geom_segment( 
+    aes(xend = sample_id, yend = 0), color = "black"
+    ) +
+  geom_point(size = 3) +
+  scale_color_manual(values = c("orange", "lightblue4")) +
+  scale_y_continuous(breaks = seq(from = -2500, to = 20000, by = 2500)) +
+  facet_wrap(vars(gas)) +
+  labs(
+    x = "Sample ID",
+    y = expression(paste(delta^{13}, "C (\u2030)"))
+  ) +
+  theme_bw() +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.background = element_rect(fill = "white"), 
+    panel.grid = element_blank(),
+    legend.position = "None"
+  )
+```
