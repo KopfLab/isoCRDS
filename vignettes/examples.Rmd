@@ -15,8 +15,6 @@ library(isoCRDS)
 library(ggstackplot)
 ```
 
-This workflow assumes you have run your samples on the Picarro CRDS and collected a day's worth of `.dat` files in a single directory.
-
 ### Step 1: Collect your data.
 
 Move your `.dat` files into your working directory. Each batch of files that correspond to a continuous stretch of time should share a directory. If you have multiple continuous stretches of data, use different folders for them and process them separately. (This will make the plotting and mapping much more straightforward.)
