@@ -32,7 +32,7 @@ iso_crds_app <- function(...) {
     textInput("sampleName", "Enter Sample Name:", ""),         # here the user defines their sample ID
     actionButton("addSampleId", "Add Sample ID"),              # and must press this to map it to their data
     textInput("outputFileName", "Enter Output File Name (without extension):", "modified_data"), # user defines output file name
-    actionButton("saveButton", "Save Mapped Data as RDS").     # a button to save their mapped data as RDS
+    actionButton("saveButton", "Save Mapped Data as RDS")      # a button to save their mapped data as RDS
   )
 
   crds_server <- function(input, output, session) {
