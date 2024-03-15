@@ -21,8 +21,8 @@ iso_read_crds <- function(path, timezone = "UTC") {
       TIME = lubridate::hms(TIME), # convert column to time type
       # convert to datetime format, account for timezone difference
       datetime = dplyr::case_when(
-        timezone == "UTC" ~ ymd_hms(DATE + TIME),
-        timezone != "UTC" ~ ymd_hms(DATE + TIME) |> with_tz(timezone)
+        timezone == "UTC" ~ lubridate::ymd_hms(DATE + TIME),
+        timezone != "UTC" ~ lubridate::ymd_hms(DATE + TIME) |> lubridate::with_tz(timezone)
       ),
       filename = path # note the file it was imported from
     ) |>
