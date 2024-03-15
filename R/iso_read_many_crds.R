@@ -21,7 +21,7 @@
 iso_read_many_crds <- function(directory, timezone = "UTC") {
   file_names <- list.files(path = directory, full.names = TRUE)
 
-  combined_tibble <- map(file_names, iso_read_crds(directory = directory, timezone = timezone)) |>
+  combined_tibble <- map(file_names, iso_read_crds, timezone = timezone) |>
     list_rbind()
 
   return(combined_tibble)
