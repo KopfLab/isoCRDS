@@ -24,18 +24,31 @@ iso_crds_app <- function(...) {
 
   # Define the App UI
   crds_ui <- fluidPage(
-    theme = bs_theme(version = 4, bootswatch = "materia"),     # theme options
-    fileInput("uploadFile", "Upload RDS file:"),               # a button to upload CRDS data in RDS format
-    selectInput("xColumn", "Select X Axis:", ""),              # allow user to choose X axis
-    selectInput("yColumn", "Select Y Axis:", ""),              # allow user to choose Y axis
-    plotlyOutput("scatterPlot"),                               # render a plotly of the CRDS data
-    textInput("sampleName", "Enter Sample Name:", ""),         # here the user defines their sample ID
-    actionButton("addSampleId", "Add Sample ID"),              # and must press this to map it to their data
-    textInput("outputFileName", "Enter Output File Name (without extension):", "modified_data"), # user defines output file name
-    actionButton("saveButton", "Save Mapped Data as RDS")      # a button to save their mapped data as RDS
+    theme = bs_theme(version = 4, bootswatch = "yeti"),        # theme options
+    titlePanel("isoCRDS Interactive Data Mapper"),             # title
+    # Define our layout style: sidebar layout
+    sidebarLayout(
+      # The sidebar:
+      sidebarPanel(
+        fileInput("uploadFile", "Upload RDS file:"),               # a button to upload CRDS data in RDS format
+        selectInput("xColumn", "Select X Axis:", ""),              # allow user to choose X axis
+        selectInput("yColumn", "Select Y Axis:", ""),              # allow user to choose Y axis
+        textInput("sampleName", "Enter Sample Name:", ""),         # here the user defines their sample ID
+        actionButton("addSampleId", "Add Sample ID"),              # and must press this to map it to their data
+        textInput("outputFileName", "Enter Output File Name (without extension):", "modified_data"), # user defines output file name
+        actionButton("saveButton", "Save Mapped Data as RDS")      # a button to save their mapped data as RDS
+      ),
+      # The Main Panel:
+      mainPanel(
+        plotlyOutput("scatterPlot"),                               # render a plotly of the CRDS data
+
+      )
+    )
   )
 
   crds_server <- function(input, output, session) {
+    options(shiny.maxRequestSize=100*1024^2) # set the maximum upload size to 100 MB
+
     data <- reactiveVal(NULL)       # create an empty reactive
 
     # Wait for an event: a user uploads a .RDS file of CRDS data.
@@ -79,7 +92,7 @@ iso_crds_app <- function(...) {
           x = ~.data[[x_column]],
           y = ~.data[[y_column]],
           type = "scatter",
-          mode = "markers"
+          mode = "lines"
           ) |>
           layout(
             xaxis = list(title = x_column),
