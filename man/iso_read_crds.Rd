@@ -15,3 +15,10 @@ a tibble of cleaned Picarro data
 \description{
 reads Picarro cavity ring down spectroscopy 'CRDS' .dat file
 }
+\examples{
+# read a data file
+iso_read_crds("a_crds_data_file.dat")
+# pass the data to a variable in your R workspace
+df <- iso_read_crds("a_crds_data_file.dat")
+df
+}
