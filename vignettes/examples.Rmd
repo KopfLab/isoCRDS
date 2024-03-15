@@ -27,7 +27,7 @@ On the other hand, `iso_read_many_crds()` takes a directory as its path argument
 
 ```{r}
 # reading many files into a single dataframe
-full_crds_data <- iso_read_many_crds("2023-08-04_Memory_Test/")
+full_crds_data <- iso_read_many_crds("vignettes/2023-08-04_Memory_Test/")
 # Let's look at what columns are present in the CRDS dataset
 glimpse(full_crds_data)
 
@@ -39,7 +39,7 @@ count(full_crds_data)
 
 ```{r}
 # Reading a single file
-single_crds_data <- iso_read_crds("2023-08-04_Memory_Test/CFIDS2308-20230804-001241Z-DataLog_User.dat")
+single_crds_data <- iso_read_crds("vignettes/2023-08-04_Memory_Test/CFIDS2308-20230804-001241Z-DataLog_User.dat")
 
 # how many rows?
 count(single_crds_data)
