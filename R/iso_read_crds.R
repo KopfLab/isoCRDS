@@ -14,11 +14,12 @@
 
 # Use this for reading a single CRDS file:
 iso_read_crds <- function(path) {
-  read.delim(path , sep = "", header = T) |>
+  read.delim(path , sep = "", header = TRUE) |>
     dplyr::mutate(
       DATE = lubridate::ymd(DATE), # convert column to date type
       TIME = lubridate::hms(TIME), # convert column to time type
-      datetime = DATE + TIME # create a single datetime column
+      datetime = DATE + TIME, # create a single datetime column
+      filename = path # note the file it was imported from
     ) |>
     dplyr::select(datetime, everything()) # put it at the front for readability
 
