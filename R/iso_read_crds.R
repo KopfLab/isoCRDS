@@ -22,7 +22,7 @@ iso_read_crds <- function(path, timezone = "UTC") {
       # convert to datetime format, account for timezone difference
       datetime = dplyr::case_when(
         timezone == "UTC" ~ ymd_hms(DATE + TIME),
-        timezone != "UTC" ~ ymd_hms(DATE + TIME, tz = timezone)
+        timezone != "UTC" ~ ymd_hms(DATE + TIME) |> with_tz(timezone)
       ),
       filename = path # note the file it was imported from
     ) |>
